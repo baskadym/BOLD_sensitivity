@@ -1,7 +1,7 @@
 % calculates effective echo time from GE field map and the EPI parameters
 % according to analytical Eq. (1) from N. Chen et al. NeuroImage 31 (2006) 609? 622
-% written by Barbara Dymerska
-% used for BOLD sensitivity estimation in our study
+% code written by Barbara Dymerska
+% used for BOLD sensitivity estimation in our study:
 % Dymerska, Barbara, et al. 
 % "The Impact of Echo Time Shifts and Temporal Signal Fluctuations on BOLD Sensitivity 
 % in Presurgical Planning at 7 T." Investigative radiology 54.6 (2019): 340-348.
@@ -9,13 +9,13 @@
 
 %%%%%%%%%%% USER PARAMETERS %%%%%%%%%%%
 
-root_dir = '/path/to/your/field/map' ;
+root_dir = '/path/to/your/field/map' ; % this is also where the local TE maps will be saved
 GEFM_name = 'your_fieldmap.nii' ;
 
 
 % EPI parameters
 Tesp = 0.00078; % the effective echo spacing in EPI in sec
-iPAT = 2 ; % in-plane acceleration factor
+iPAT = 2 ; % acceleration factor in phase encoding direction
 PE_dir = 1 ; % 1 for Posterior-Anterior and -1 for Anterior-Posterior
 pF = 0.75 ; % partial fourier
 TE = 0.022 ; % the effective echo time in seconds set as sequence parameter
