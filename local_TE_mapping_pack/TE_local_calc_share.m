@@ -1,4 +1,4 @@
-% calculates effective echo time from GE field map and the EPI parameters
+% calculates a map of loacal echo times from GE field map and EPI sequence parameters
 % according to analytical Eq. (1) from N. Chen et al. NeuroImage 31 (2006) 609? 622
 % code written by Barbara Dymerska
 % used for BOLD sensitivity estimation in our study:
@@ -10,7 +10,7 @@
 %%%%%%%%%%% USER PARAMETERS %%%%%%%%%%%
 
 root_dir = '/path/to/your/field/map' ; % this is also where the local TE maps will be saved
-GEFM_name = 'your_fieldmap.nii' ;
+GEFM_name = 'your_fieldmap.nii' ; % unwrapped gradient echo fieldmap in Hz
 
 
 % EPI parameters
@@ -26,7 +26,7 @@ TE = 0.022 ; % the effective echo time in seconds set as sequence parameter
 disp('loading GE field map') ;
 GEFM_file = fullfile(root_dir,GEFM_name) ;
 GEFM_nii = load_nii(GEFM_file) ;
-[Gy,~,~] = gradient(PE_dir*GEFM_nii.img/2/pi) ; % in gradient function x is swaped with y, i.e. the gradient in the PE-direction is in x-direction
+[Gy,~,~] = gradient(PE_dir*GEFM_nii.img) ; % in gradient function x is swaped with y, i.e. the gradient in the PE-direction is in x-direction
 
 
 Gy_nii = make_nii(Gy, GEFM_nii.hdr.dime.pixdim(2:4)) ;
