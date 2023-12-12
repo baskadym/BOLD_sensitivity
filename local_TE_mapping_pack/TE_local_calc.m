@@ -1,36 +1,23 @@
-% calculates a map of loacal echo times from GE field map and EPI sequence parameters
+% calculates a map of local echo times from GE field map and EPI sequence parameters
 % according to analytical Eq. (1) from N. Chen et al. NeuroImage 31 (2006) 609? 622
-% code written by Barbara Dymerska
-% used for BOLD sensitivity estimation in our study:
-% Dymerska, Barbara, et al.
-% "The Impact of Echo Time Shifts and Temporal Signal Fluctuations on BOLD Sensitivity
-% in Presurgical Planning at 7 T." Investigative radiology 54.6 (2019): 340-348.
-% last modified: 24.06.2021
-
-% modified by Nadine Graedel Nov 2021: modifications to nifti read/write
-% and TE_min/TE_max calculation
-% January 2022 - BKD - rotation to EPI space added 
+%
+% code written by Barbara Dymerska 
+% code reviewed by Nadine Graedel
+%
+% If used please cite both:
+% N. Chen et al. NeuroImage 31 (2006) 609-622
+% B. Dymerska et al. Investigative Radiology 54.6 (2019): 340-348.
 
 %%%%%%%%%%% USER PARAMETERS %%%%%%%%%%%
 
-%---- For 2 seg
-root_dir = '/home/bdymerska/Documents/data/7T/2021/M700302_analysis/QSM/'; % this is also where the local TE maps will be saved
+root_dir = '/your/root/dir/'; % this is also where the local TE maps will be saved
 GEFM_name = 'B0.nii'; % unwrapped gradient echo fieldmap in Hz
 
-% EPI parameters - 1331 early PF
-% EPI_file = '~/Documents/data/7T/2021/M700302_analysis/nc_epi3d_v2q_1331_earlyPF_TE17p7_TR43_0p8mm_PAT4x2_PF68_0007/f2022-01-06_10-05-102625-00001-00001-1.nii';
-% Tesp = 0.00122; % the effective echo spacing in EPI in sec
-% iPAT = 8 ; % acceleration factor in phase encoding direction
-% pF_late = 1 ; % partial fourier last bit of k-space
-% pF_early = 6/8 ; % partial fourier first bit of k-space
-% PE_dir = 1 ; % 1 for Posterior-Anterior and -1 for Anterior-Posterior
-% TE = 0.01770 + 0.0015/2 ; % the effective echo time in seconds set as sequence parameter
-% my = 240 ; % matrix size in phase encoding direction
 
-% EPI parameters - 121 late PF
-EPI_file = '~/Documents/data/7T/2021/M700302_analysis/nc_epi3d_v2r_121_latePF_NavOff_TE22p58_TR37_0006/f2022-01-06_10-05-101532-00001-00001-1.nii';
+% EPI parameters:
+EPI_file = '/path/to/your/EPI/file/image.nii';
 Tesp = 0.00122; % the effective echo spacing in EPI in sec
-iPAT = 8 ; % acceleration factor in phase encoding direction
+iPAT = 4 ; % total acceleration factor in phase encoding direction
 pF_late = 6/8 ; % partial fourier last bit of k-space
 pF_early = 1 ; % partial fourier first bit of k-space
 PE_dir = -1 ; % 1 for Posterior-Anterior and -1 for Anterior-Posterior
@@ -46,13 +33,10 @@ output_dir = root_dir ;
 disp('calculating the effective echo spacing') ;
 Tesp = Tesp/iPAT ;
 
-disp('calculating maximum TE allowed, above which type II loses occur (signal goes out of the acquired k-space)') ;
+disp('calculating maximum/minimum TE allowed, above which type II loses occur (signal goes out of the acquired k-space)') ;
+% we take into account the time it takes for excitation, navigators and any fill time. 
 TE_max = TE + my*(pF_late-1/2)*Tesp;   
 TE_min = TE - my*(pF_early-1/2)*Tesp; 
-% NNG: in the original script this was TE_max = my*pF*Tesp; and TE_min = 0
-% this assumes that the readout starts immediately at t = 0, the new
-% version takes into account the time it takes for excitation, navigators
-% and any fill time. 
 
 
 disp('loading and reslicing field map to match EPI space (e.g. for oblique slices)')
@@ -96,14 +80,7 @@ end
 TEloc_file = fullfile(root_dir, 'TE_local.nii') ;
 createNifti(TEloc, TEloc_file, EPI_spm.mat);
 
-% NNG - save shift in local TE in ms
 disp('saving local TE different to nominal') ;
 TEloc_file = fullfile(root_dir, 'TE_local_diff_ms.nii') ;
 createNifti((TEloc-TE)*1000, TEloc_file, EPI_spm.mat);
-
-
-
-
-
-
 
